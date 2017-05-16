@@ -23,14 +23,34 @@ $(document).ready(function() {
 
         // Set up button click-handlers
         $("#snooze-buttons button").click(function() {
-            var time = getTime($(this).attr("id"));
-            snoozeCurrentTab(time);
+            var timeName = $(this).attr("id");
+            console.log("button-clicked", timeName);
+
+            if(timeName == "pick-date") {
+                $("#datepicker").slideDown({
+                    duration: 500,
+                    easing: "easeInOutBack"
+                });
+            } else {
+                var time = getTime($(this).attr("id"));
+                snoozeCurrentTab(time);
+            }
         });
 
         $("#settings").click(function() {
             console.log("options clicked");
             window.open(chrome.extension.getURL("options/index.html#settings"));
         });
+
+        // Set up datepicker
+        $("#datepicker").datepicker({
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            showButtonPanel: true
+        });
+
+        // Set up listener for keyboard shortcuts
+        setupKeyboardCommands();
 
         // Set up listener for when snoozedTabs changes
         $(window).bind("storage", function(e) {
@@ -123,7 +143,6 @@ $(document).ready(function() {
                 result.setMonth(result.getMonth() + settings["someday"]);
                 break;
             case "pick-date":
-                bg.alert("Picking date is not yet available, sorry!");
                 result = undefined;
                 break;
             default:
@@ -162,6 +181,53 @@ $(document).ready(function() {
 
         result.setHours(hour, minute, 0, 0);
         return result;
+    }
+
+    function setupKeyboardCommands() {
+        var buttons = $("#snooze-buttons button");
+        $(window).bind("keypress", function(e) {
+            var code = (e.keyCode ? e.keyCode : e.which);
+            switch(code) {
+                case 49:
+                    console.log("pressed 1");
+                    buttons[0].click();
+                    break;
+                case 50:
+                    console.log("pressed 2");
+                    buttons[1].click();
+                    break;
+                case 51:
+                    console.log("pressed 3");
+                    buttons[2].click();
+                    break;
+                case 113:
+                    console.log("pressed q");
+                    buttons[3].click();
+                    break;
+                case 119:
+                    console.log("pressed w");
+                    buttons[4].click();
+                    break;
+                case 101:
+                    console.log("pressed e");
+                    buttons[5].click();
+                    break;
+                case 97:
+                    console.log("pressed a");
+                    buttons[6].click();
+                    break;
+                case 115:
+                    console.log("pressed s");
+                    buttons[7].click();
+                    break;
+                case 100:
+                    console.log("pressed d");
+                    buttons[8].click();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 });
 

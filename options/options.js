@@ -98,7 +98,6 @@ function setupSettings() {
         console.log("" + setting + " = " + time);
         settings[setting] = time;
         bg.setSettings(settings);
-        console.log("settings", bg.getSettings());
     });
 
     $("select.control").change(function(e){
@@ -108,8 +107,6 @@ function setupSettings() {
 
         settings[setting] = value;
         bg.setSettings(settings);
-
-        console.log("settings", bg.getSettings());
     });
 
     $("input[name='badge']").change(function(){
@@ -118,9 +115,15 @@ function setupSettings() {
 
         settings["badge"] = badgeVal;
         bg.setSettings(settings);
-
-        console.log("settings", settings);
         bg.updateBadgeText();
+    });
+
+    $("input[name='open-new-tab']").change(function(){
+        var openVal = $(this).val();
+        console.log("Open in new tab?", openVal);
+
+        settings["open-new-tab"] = openVal;
+        bg.setSettings(settings);
     });
 }
 
@@ -136,6 +139,8 @@ function renderSettings() {
 
     $("input[name='badge']").val([settings["badge"]]);
     bg.updateBadgeText();
+
+    $("input[name='open-new-tab']").val([settings["open-new-tab"]]);
 }
 
 function setupAbout() {
@@ -169,14 +174,14 @@ function listSnoozedTabs() {
         $(".no-tabs").hide();
     }
 
-    var alarmTimes = Object.keys(snoozedTabs).sort();
-    console.log("alarmTimes", alarmTimes);
+    var popTimes = Object.keys(snoozedTabs).sort();
+    console.log("popTimes", popTimes);
 
-    for(var i = 0; i < alarmTimes.length - 1; i++) {
-        var alarmTime = alarmTimes[i];
-        var alarmSet = snoozedTabs[alarmTime];
+    for(var i = 0; i < popTimes.length - 1; i++) {
+        var popTime = popTimes[i];
+        var alarmSet = snoozedTabs[popTime];
 
-        var day = (new Date(parseInt(alarmTime)));
+        var day = (new Date(parseInt(popTime)));
         day.setHours(0, 0, 0, 0);
 
         var dayHeading = $("#day-" + day.getTime());
@@ -219,7 +224,7 @@ function listTab(tab, day) {
 
     var time = $(document.createElement('time'));
     time.addClass("entry-time");
-    time.text(formatTime(tab.alarmTime));
+    time.text(formatTime(tab.popTime));
 
     var favicon = $(document.createElement('span'));
     favicon.addClass("entry-favicon");
@@ -289,8 +294,8 @@ function formatDay(day) {
     return result;
 }
 
-function formatTime(alarmTime) {
-    var time = new Date(alarmTime);
+function formatTime(popTime) {
+    var time = new Date(popTime);
     console.log(time);
 
     var hours = time.getHours() % 12;
@@ -343,10 +348,12 @@ function clearEntry(tab, entry) {
     var dayLi = dayList.parent();
 
     console.log(dayList);
+    console.log(dayLi);
     console.log(dayList.children().length);
 
     if(dayList.children().length == 1) {
         dayLi.fadeOut(function() {
+            console.log($(this));
             $(this).remove();
         });
     } else {
